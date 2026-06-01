@@ -2,13 +2,15 @@ import crypto from "crypto";
 import OTP from "../models/OTP.js";
 import { sendEmailIfConfigured } from "./email.js";
 
-export const generateOTP = () => {
+export const generateOTP =async () => {
     return String(Math.floor(100000 + Math.random() * 900000));
 };
 
 export const sendOTP = async (email) => {
     const normalizedEmail = String(email).toLowerCase().trim();
-    const otp = generateOTP();
+    console.log(normalizedEmail, "email")
+    const otp =await generateOTP();
+    console.log(otp, "otp")
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
     await OTP.deleteMany({ email: normalizedEmail });
@@ -25,7 +27,7 @@ export const sendOTP = async (email) => {
         subject: "Your Community Problem Solver OTP",
         text: `Your OTP is: ${otp}\n\nThis OTP will expire in 10 minutes. Do not share this with anyone.`
     });
-
+    console.log(emailSent,"emailSent")
     return { sent: emailSent.sent };
 };
 
