@@ -14,6 +14,7 @@ const buildTransporter = () => {
     if (!hasEmailConfig()) {
         return null;
     }
+    console.log(hasEmailConfig(),"hasEmailConfig")
 
     return nodemailer.createTransport({
         host: process.env.SMTP_HOST,
@@ -33,18 +34,37 @@ export const sendEmailIfConfigured = async ({ to, subject, text }) => {
     if (!transporter || !to) {
         return { sent: false };
     }
-    
-    try {
-        await transporter.sendMail({
-            from: process.env.FROM_EMAIL,
-            to,
-            subject,
-            text
-        });
 
-        return { sent: true };
-    } catch (error) {
-        console.error("Email send failed:", error.message);
-        return { sent: false };
-    }
+    // try {
+    //     await transporter.sendMail({
+    //         from: process.env.FROM_EMAIL,
+    //         to,
+    //         subject,
+    //         text
+    //     });
+
+    //     return { sent: true };
+    // } catch (error) {
+    //     console.error("Email send failed:", error.message);
+    //     return { sent: false };
+    // }
+    try {
+    await transporter.verify();
+    console.log("SMTP verified successfully");
+
+    const info = await transporter.sendMail({
+        from: process.env.FROM_EMAIL,
+        to,
+        subject,
+        text
+    });
+
+    console.log("Email sent:", info.messageId);
+
+    return { sent: true };
+} catch (error) {
+    console.error("Full email error:", error);
+    console.error("Error code:", error.code);
+    return { sent: false };
+}
 };
