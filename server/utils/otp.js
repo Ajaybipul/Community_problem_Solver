@@ -14,14 +14,14 @@ export const sendOTP = async (email) => {
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
     await OTP.deleteMany({ email: normalizedEmail });
-
+    console.log("OTP deleted successfully")
     await OTP.create({
         email: normalizedEmail,
         otp,
         expiresAt,
         attempts: 0
     });
-
+console.log("OTP created successfully")
     const emailSent = await sendEmailIfConfigured({
         to: normalizedEmail,
         subject: "Your Community Problem Solver OTP",
