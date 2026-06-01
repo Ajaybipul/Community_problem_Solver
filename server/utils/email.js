@@ -27,12 +27,13 @@ const buildTransporter = () => {
 };
 
 export const sendEmailIfConfigured = async ({ to, subject, text }) => {
+    console.log(to, subject, text,"sendEmailIfConfigured")
     const transporter = buildTransporter();
-
+    console.log(transporter,"transporter")
     if (!transporter || !to) {
         return { sent: false };
     }
-
+    
     try {
         await transporter.sendMail({
             from: process.env.FROM_EMAIL,
