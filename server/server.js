@@ -29,17 +29,33 @@ const allowedOrigins = [
     .map((origin) => origin.trim())
     .filter(Boolean)
 ].filter(Boolean);
+console.log("Allowed Origins:", allowedOrigins);
 
 app.use(cors({
   origin: (origin, callback) => {
-    console.log(origin);
-    if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
-    callback(new Error('Not allowed by CORS'));
+    console.log("Incoming Origin:", origin);
+
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    console.log("Blocked Origin:", origin);
+    callback(new Error("Not allowed by CORS"));
   },
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  credentials: true
 }));
+// console.log('Allowed Origins:', allowedOrigins);
+// app.use(cors({
+//   origin: (origin, callback) => {
+//     console.log(origin);
+//     if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+//     console.log('Blocked Origin:', origin);
+//     callback(new Error('Not allowed by CORS'));
+//   },
+//   credentials: true,
+//   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+//   allowedHeaders: ['Content-Type', 'Authorization']
+// }));
 // Note: explicit app.options for wildcard paths can cause path-to-regexp errors
 // The global CORS middleware above will handle preflight requests, so no explicit
 // wildcard options route is required here.
