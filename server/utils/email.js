@@ -54,13 +54,7 @@ export const sendEmailIfConfigured = async ({ to, subject, text }) => {
     //     console.error("Email send failed:", error.message);
     //     return { sent: false };
     // }
-   try {
-    console.log("Starting SMTP verify...");
-
-    await transporter.verify();
-
-    console.log("SMTP verified successfully");
-
+  try {
     console.log("Starting sendMail...");
 
     const info = await transporter.sendMail({
@@ -74,8 +68,8 @@ export const sendEmailIfConfigured = async ({ to, subject, text }) => {
 
     return { sent: true };
 } catch (error) {
-    console.error("VERIFY/SEND ERROR:", error);
-    console.error("Code:", error.code);
+    console.error("Full email error:", error);
+    console.error("Error code:", error.code);
     return { sent: false };
 }
 };
