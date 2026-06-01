@@ -15,7 +15,13 @@ const buildTransporter = () => {
         return null;
     }
     console.log(hasEmailConfig(),"hasEmailConfig")
-
+console.log({
+  host: process.env.SMTP_HOST,
+  port: process.env.SMTP_PORT,
+  secure: process.env.SMTP_SECURE,
+  user: process.env.SMTP_USER,
+  from: process.env.FROM_EMAIL
+});
     return nodemailer.createTransport({
         host: process.env.SMTP_HOST,
         port: Number(process.env.SMTP_PORT),
