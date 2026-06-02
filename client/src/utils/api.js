@@ -3,7 +3,7 @@ import axios from 'axios';
 const rawApiUrl = import.meta.env.VITE_API_URL;
 const normalizedBaseUrl = rawApiUrl
   ? rawApiUrl.replace(/\/+$/, '')
-  : 'http://localhost:3000';
+  : 'https://community-problem-solver-hjmz.onrender.com';
 
 const API = axios.create({
   baseURL: normalizedBaseUrl.endsWith('/api')

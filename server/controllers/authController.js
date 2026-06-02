@@ -4,7 +4,6 @@ import User from '../models/User.js'
 import Problem from "../models/Problem.js";
 import Solution from "../models/Solution.js";
 import Discussion from "../models/Discussion.js";
-import { sendOTP, verifyOTP } from '../utils/otp.js'
 
 
 export const register = async (req, res) => {
@@ -22,17 +21,17 @@ export const register = async (req, res) => {
         const newuser = new User({name, email, password : hashedpassword, city: city || "", role: "user", volunteerStatus: "none"})
         await newuser.save()
 
-        const result = await sendOTP(email);
-
-        if (!result.sent) {
-            await User.deleteOne({ _id: newuser._id });
-            return res.status(503).json({ message: "Unable to send OTP email. Please check mail settings and try again." });
+        if (!process.env.JWT_SECRET) {
+            console.error('JWT_SECRET is not set');
+            return res.status(500).json({ message: 'Server configuration error: JWT_SECRET not set' });
         }
 
+        const token = jwt.sign({ id: newuser._id, email: newuser.email }, process.env.JWT_SECRET, { expiresIn: '7d' });
+
         return res.status(201).json({
-            message : "User registered successfully. OTP sent to your email.",
+            message : "User registered successfully.",
             user : { id: newuser._id, name: newuser.name, email: newuser.email, role: newuser.role, city: newuser.city, volunteerStatus: newuser.volunteerStatus },
-            otpSent: result.sent
+            token
         })
     } catch (error) {
         console.log(error);
@@ -71,65 +70,6 @@ export const login = async (req, res) => {
         return res.status(500).json({message : "Internal server Error"})
     }
 }
-
-export const verifyLoginOTP = async (req, res) => {
-    try {
-        const { email, otp } = req.body;
-
-        if (!email || !otp) {
-            return res.status(400).json({ message: "Email and OTP are required" });
-        }
-
-        const otpResult = await verifyOTP(email, otp);
-        if (!otpResult.valid) {
-            return res.status(400).json({ message: otpResult.message });
-        }
-
-        const user = await User.findOne({ email });
-        if (!user) {
-            return res.status(404).json({ message: "User not found" });
-        }
-
-        if (!process.env.JWT_SECRET) {
-            console.error('JWT_SECRET is not set');
-            return res.status(500).json({ message: 'Server configuration error: JWT_SECRET not set' });
-        }
-
-        const token = jwt.sign({ id: user._id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '7d' });
-
-        return res.status(200).json({
-            message: "Login successful",
-            user: { id: user._id, name: user.name, email: user.email, role: user.role, city: user.city, volunteerStatus: user.volunteerStatus },
-            token
-        });
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json({ message: "Internal server Error" });
-    }
-};
-
-export const resendOTP = async (req, res) => {
-    try {
-        const { email } = req.body;
-
-        if (!email) {
-            return res.status(400).json({ message: "Email is required" });
-        }
-        const result = await sendOTP(email);
-
-        if (!result.sent) {
-            return res.status(503).json({ message: "Unable to send OTP email. Please check mail settings and try again." });
-        }
-
-        return res.status(200).json({
-            message: "OTP sent successfully",
-            otpSent: result.sent
-        });
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json({ message: "Internal server Error" });
-    }
-};
 
 export const updateProfile = async (req, res) => {
     try {
@@ -248,14 +188,8 @@ export const registerVolunteer = async (req, res) => {
 
         await newuser.save();
 
-        const result = await sendOTP(email);
-        if (!result.sent) {
-            await User.deleteOne({ _id: newuser._id });
-            return res.status(503).json({ message: "Unable to send OTP email. Please check mail settings and try again." });
-        }
-
         return res.status(201).json({
-            message: "Volunteer application submitted. OTP sent to your email.",
+            message: "Volunteer application submitted.",
             user: {
                 id: newuser._id,
                 name: newuser.name,
@@ -263,8 +197,7 @@ export const registerVolunteer = async (req, res) => {
                 role: newuser.role,
                 city: newuser.city,
                 volunteerStatus: newuser.volunteerStatus
-            },
-            otpSent: result.sent
+            }
         });
     } catch (error) {
         console.log(error);

@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { User, Mail, Lock, ArrowRight } from 'lucide-react';
 import { toast } from 'react-toastify';
 import API from '../utils/api.js';
+import { setAuthData } from '../utils/auth.js';
 
 const Register = () => {
     const navigate = useNavigate();
@@ -39,20 +40,18 @@ const Register = () => {
         setLoading(true);
 
         try {
-            await API.post('/auth/register', {
+            const response = await API.post('/auth/register', {
                 name: formData.name,
                 email: formData.email,
                 password: formData.password
             });
 
-            navigate('/otp-verify', {
-                state: {
-                    email: formData.email,
-                    isNewUser: true
-                }
-            });
+            const user = response.data.user;
+            const token = response.data.token;
+            setAuthData(user, token);
 
-            toast.success('Registration successful! OTP sent to your email');
+            toast.success('Registration successful! You are now logged in.');
+            navigate('/dashboard');
 
         } catch (error) {
             toast.error(error.response?.data?.message || 'Registration failed');

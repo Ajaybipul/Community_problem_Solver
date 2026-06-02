@@ -59,12 +59,8 @@ const VolunteerApply = () => {
 				navigate("/dashboard");
 			} else {
 				await API.post("/auth/register-volunteer", formData);
-				toast.success(
-					"Volunteer application submitted. OTP sent to your email",
-				);
-				navigate("/otp-verify", {
-					state: { email: formData.email },
-				});
+				toast.success("Volunteer application submitted. Please log in.");
+                                navigate("/login");
 			}
 		} catch (error) {
 			toast.error(
@@ -191,3 +187,5 @@ const VolunteerApply = () => {
 };
 
 export default VolunteerApply;
+
+

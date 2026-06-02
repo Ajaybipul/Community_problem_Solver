@@ -8,7 +8,6 @@ import './index.css';
 import Landing from './pages/Landing.jsx';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
-import OTPVerify from './pages/OTPVerify.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 import Problems from './pages/Problems.jsx';
 import ProblemDetail from './pages/ProblemDetail.jsx';
@@ -46,7 +45,6 @@ function App() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/volunteer-apply" element={<VolunteerApply />} />
-                <Route path="/otp-verify" element={<OTPVerify />} />
                 
                 <Route 
                     path="/dashboard" 
